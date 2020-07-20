@@ -1,0 +1,37 @@
+{
+  "name": "basic_authentication_server",
+  "version": "1.0.0",
+  "description": "A basic example of using authentication with GraphQL.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec babel-node ./index.js"
+  },
+  "author": "Craig Stroman",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.10.4",
+    "@babel/core": "^7.10.4",
+    "@babel/node": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
+    "babel-loader": "^8.1.0",
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5"
+  },
+  "dependencies": {
+    "apollo-server-express": "^2.15.1",
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-jwt": "^6.0.0",
+    "graphql-subscriptions": "^1.1.0",
+    "graphql-tools": "^6.0.12",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.19",
+    "pg": "^8.3.0",
+    "pg-hstore": "^2.3.3",
+    "pug": "^3.0.0",
+    "sequelize": "^5.21.2",
+    "subscriptions-transport-ws": "^0.9.17"
+  }
+}
