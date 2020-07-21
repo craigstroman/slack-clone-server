@@ -1,6 +1,9 @@
 import { tryLogin } from '../auth';
 import requiresAuth from '../permissions';
 import formatErrors from '../formatErrors';
+import shortid from 'shortid';
+
+shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-');
 
 const resolvers = {
   Query: {
@@ -40,6 +43,8 @@ const resolvers = {
      */
     register: async (parent, args, { models }) => {
       try {
+        args['uuid'] = shortid.generate();
+
         const user = await models.User.create(args);
 
         return {
