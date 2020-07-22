@@ -20,6 +20,8 @@ const sequelize = new Sequelize(db, dbUser, dbPassword, {
 
 const models = {
   User: sequelize.import('./users'),
+  Team: sequelize.import('./team'),
+  Channel: sequelize.import('./channel'),
 };
 
 Object.keys(models).forEach((modelName) => {
