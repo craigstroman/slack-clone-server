@@ -1,38 +1,10 @@
 import path from 'path';
 import express from 'express';
-import { execute, subscribe } from 'graphql';
 import { ApolloServer } from 'apollo-server-express';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
 import jwt from 'express-jwt';
 import { indexPage } from './controllers';
 import models from './models/index';
 import schema from './schema';
-
-/**
-  Running the register mutation in GraphQL to test run:
-
-mutation {
-  register(username:"craig1", email:"craig1@test.com", password:"test12")
-  {
-    ok
-    user {
-      id
-      username
-    }
-  }
-}
-
-mutation {
-  register(username:"craig3", email:"craig3@test.com", password:"test1234")
-  {
-    ok
-    user {
-      id
-      username
-    }
-  }
-}
-**/
 
 require('dotenv').config();
 
@@ -54,7 +26,7 @@ const auth = jwt({
 
 app.use(auth);
 
-app.use('/', indexPage);
+//app.use('/', indexPage);
 
 const server = new ApolloServer({
   schema,
@@ -71,30 +43,5 @@ models.sequelize.sync().then(() => {
     console.log('The server started on port ' + PORT);
 
     console.log(`GraphQL endpoint: http://localhost:${PORT}${endpoint}`);
-
-    // new SubscriptionServer(
-    //   {
-    //     execute,
-    //     subscribe,
-    //     schema,
-    //     onConnect: async ({ token, refreshToken }, webSocket) => {
-    //       if (token && refreshToken) {
-    //         try {
-    //           const { user } = jwt.verify(token, SECRET);
-    //           return { models, user };
-    //         } catch (err) {
-    //           const newTokens = await refreshTokens(token, refreshToken, models, SECRET, SECRET2);
-    //           return { models, user: newTokens.user };
-    //         }
-    //       }
-
-    //       return { models };
-    //     },
-    //   },
-    //   {
-    //     server,
-    //     path: '/subscriptions',
-    //   },
-    // );
   });
 });
