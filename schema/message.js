@@ -10,8 +10,4 @@ export default `
   extend type Query {
     messages(channelId: Int!): [Message!]!
   }
-
-  extend type Mutation {
-    createMessage(channelId: Int!, text: String!): Boolean!
-  }
 `;
