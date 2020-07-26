@@ -12,6 +12,7 @@ const createResolver = (resolver) => {
   return baseResolver;
 };
 
+// TODO: Continue trying to figure out why this returns false for logged in user when meQuery is run on ViewTeam page.
 // requiresAuth
 export default createResolver((parent, args, { user }) => {
   if (!user || !user.id) {
