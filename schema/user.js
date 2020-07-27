@@ -4,6 +4,7 @@ export default `
     uuid: String!
     username: String!
     email: String!
+    teams: [Team!]!
   }
 
   type Query {
@@ -19,6 +20,8 @@ export default `
 
   type LoginResponse {
     ok: Boolean
+    teamUUID: String
+    channelUUID: String
     token: String
     refreshToken: String
     errors: [Error!]
