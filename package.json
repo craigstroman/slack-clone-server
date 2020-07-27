@@ -1,7 +1,7 @@
 {
-  "name": "basic_authentication_server",
+  "name": "slack-clone-server",
   "version": "1.0.0",
-  "description": "A basic example of using authentication with GraphQL.",
+  "description": "The server for slack clone.",
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec babel-node ./index.js"
