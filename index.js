@@ -17,7 +17,7 @@ require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 const SECRET1 = process.env.SECRET1;
 const SECRET2 = process.env.SECRET2;
-const graphqlEndpoint = '/graphql';
+const graphqlEndpoint = process.env.GRAPHQL_ENDPOINT;
 const subscriptionEndpoint = process.env.SUBSCRIPTION_ENDPOINT;
 const graphql = `http://localhost:${PORT}${graphqlEndpoint}`;
 const subscriptions = `ws://localhost:${PORT}${subscriptionEndpoint}`;

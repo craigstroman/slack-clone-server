@@ -1,4 +1,3 @@
-// import { PubSub, withFilter } from 'apollo-server-express';
 import { PubSub, withFilter } from 'graphql-subscriptions';
 import requiresAuth, { requiresTeamAccess } from '../permissions';
 
