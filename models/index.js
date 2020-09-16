@@ -26,7 +26,7 @@ const models = {
   DirectMessage: sequelize.import('./directMessage'),
 };
 
-Object.keys(models).forEach(modelName => {
+Object.keys(models).forEach((modelName) => {
   if ('associate' in models[modelName]) {
     models[modelName].associate(models);
   }

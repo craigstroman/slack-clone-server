@@ -37,6 +37,10 @@ export const requiresTeamAccess = createResolver(async (parent, { channelId }, {
   }
 });
 
+// export const requiresTeamAccess = createResolver((parent, args, { user }) => {
+//   console.log('requiresTeamAccess');
+// });
+
 // directMessage subscription
 export const directMessageSubscription = createResolver(
   async (parent, { teamId, userId }, { user, models }) => {

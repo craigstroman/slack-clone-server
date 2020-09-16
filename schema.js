@@ -1,18 +1,15 @@
+import path from 'path';
+import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
 import { makeExecutableSchema } from 'graphql-tools';
-import { merge } from 'lodash';
-import userTypes from './schema/user';
-import teamTypes from './schema/team';
-import channelTypes from './schema/channel';
-import messageTypes from './schema/message';
-import error from './schema/error';
-import userResolver from './resolvers/user';
-import teamResolver from './resolvers/team';
-import messageResolver from './resolvers/message';
-import channelResolver from './resolvers/channel';
+// import schemas from './schema/index';
+// import resolvers from './resolvers/index';
+
+const typeDefs = mergeTypes(fileLoader(path.join(__dirname, './schema')));
+const resolvers = mergeResolvers(fileLoader(path.join(__dirname, './resolvers')));
 
 const schema = makeExecutableSchema({
-  typeDefs: [userTypes, teamTypes, channelTypes, messageTypes, error],
-  resolvers: merge(userResolver, teamResolver, messageResolver, channelResolver),
+  typeDefs,
+  resolvers,
 });
 
 export default schema;

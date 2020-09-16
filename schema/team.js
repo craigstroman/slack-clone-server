@@ -17,7 +17,7 @@ export default `
     channelUUID: String!
   }
 
-  extend type Query {
+  type Query {
     allTeams: [Team!]!
     inviteTeams: [Team!]!
     getTeamMembers(teamId: Int!): [User!]!
@@ -28,7 +28,7 @@ export default `
     errors: [Error!]
   }
 
-  extend type Mutation {
+  type Mutation {
     createTeam(name: String!): CreateTeamResponse!
     addTeamMember(email: String!, teamId: Int!): VoidResponse!
   }

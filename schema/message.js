@@ -7,11 +7,15 @@ export default `
     createdAt: String!
   }
 
-  extend type Query {
+  type Subscription {
+    newChannelMessage(channelId: Int!): Message!
+  }
+
+  type Query {
     messages(channelId: Int!): [Message!]!
   }
 
-  extend type Mutation {
+  type Mutation {
     createMessage(channelId: Int!, text: String!): Boolean!
   }
 `;
