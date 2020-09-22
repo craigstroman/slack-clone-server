@@ -10,8 +10,6 @@ import { refreshTokens } from './auth';
 import models from './models/index';
 import schema from './schema';
 
-// TODO: Fix issue with jwt.verify error when token is null.
-
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
