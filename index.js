@@ -7,6 +7,7 @@ import { execute, subscribe } from 'graphql';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import { refreshTokens } from './auth';
+import routes from './routes/index';
 import models from './models/index';
 import schema from './schema';
 
@@ -19,11 +20,21 @@ const graphqlEndpoint = process.env.GRAPHQL_ENDPOINT;
 const subscriptionEndpoint = process.env.SUBSCRIPTION_ENDPOINT;
 const graphql = `http://localhost:${PORT}${graphqlEndpoint}`;
 const subscriptions = `ws://localhost:${PORT}${subscriptionEndpoint}`;
+const reactApp = process.env.NODE_ENV === 'development' ? '/static/js/bundle.js' : '/static/js/main.min.js';
 
 const app = express();
 
 app.set('views', path.join(__dirname, './views'));
 app.set('view engine', 'pug');
+
+app.use('/static', express.static('public'));
+
+app.use(routes);
+
+app.locals.title = 'Slack Clone';
+app.locals.content = 'A Slack clone using Express, GarphQL, and React.';
+app.locals.reactApp = reactApp;
+app.locals.env = process.env;
 
 app.use(cors('*'));
 
