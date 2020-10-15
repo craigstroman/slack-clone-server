@@ -40,9 +40,9 @@ app.use(cors('*'));
 
 const apolloServer = new ApolloServer({
   schema,
-  playground: {
+  playground: process.env.NODE_ENV === 'development' ? {
     graphqlEndpoint,
-  },
+  } : false,
   context: ({ req }) => {
     const token = req.headers['x-token'] || null;
 
