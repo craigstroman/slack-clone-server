@@ -9,7 +9,10 @@ export default `
 
   type Query {
     me: User!
+    allUsers: [User!]!
     getUser(userId: Int!): User
+    verifyUser(username: String): Boolean
+    verifyEmail(email: String): Boolean
   }
 
   type RegisterResponse {
