@@ -1,11 +1,7 @@
 import { tryLogin } from '../auth';
-import requiresAuth from '../permissions';
 import formatErrors from '../formatErrors';
+import requiresAuth from '../permissions';
 import shortid from 'shortid';
-
-require('dotenv').config();
-
-shortid.characters(process.env.SHORT_ID_CHARACTERS);
 
 export default {
   User: {
@@ -29,6 +25,14 @@ export default {
   },
   Query: {
     /**
+     * Get's all users.
+     *
+     * @param      {Object}  parent       The parent.
+     * @param      {Object}  args         The arguments.
+     * @param      {Object}  models       The models.
+     */
+    allUsers: (parent, args, { models }) => models.User.findAll(),
+    /**
      * Get's the logged in user information.
      *
      * @param      {Object}  parent       The parent.
@@ -36,31 +40,86 @@ export default {
      * @param      {Object}  user         The user.
      * @param      {Object}  models       The models.
      */
-    me: requiresAuth.createResolver((parent, args, { user, models }) => {
-      return models.User.findOne({ where: { id: user.id } });
-    }),
+    me: requiresAuth.createResolver((parent, args, { user, models }) =>
+      models.User.findOne({ where: { id: user.id } }),
+    ),
+    verifyEmail: async (parent, args, { models }) => {
+      try {
+        const { email } = args;
+        const result = await models.User.findOne({ where: { email: email } }, { raw: true });
+
+        if (result !== null) {
+          if (email === result.email) {
+            return true;
+          }
+        }
+
+        return false;
+      } catch (err) {
+        console.log(`There was an error: ${err}`);
+
+        return false;
+      }
+    },
+    /**
+     * Verify's if a user exists or not.
+     *
+     * @param      {Object}   parent       The parent
+     * @param      {Object}   args         The arguments
+     * @param      {Object}   models       The models
+     * @return     {boolean}  { description_of_the_return_value }
+     */
+    verifyUser: async (parent, args, { models }) => {
+      try {
+        const { username } = args;
+        const result = await models.User.findOne({ where: { username: username } }, { raw: true });
+
+        if (result !== null) {
+          if (username === result.username) {
+            return true;
+          }
+        }
+
+        return false;
+      } catch (err) {
+        console.log(`There was an error: ${err}`);
+
+        return false;
+      }
+    },
   },
   Mutation: {
+    /**
+     * Logs a user in.
+     *
+     * @param      {Object}  parent         The parent
+     * @param      {String}  email          The email.
+     * @param      {String}  password       The password.
+     * @param      {Object}  models         The models.
+     * @param      {String}  SECRET         The secret.
+     * @param      {String}  SECRET2        The secret 2.
+     */
     login: async (parent, { email, password }, { models, SECRET1, SECRET2 }) => {
       const loginResult = await tryLogin(email, password, models, SECRET1, SECRET2);
-      let result = {};
+      let result = null;
+      let teams = null;
+      let team = null;
+      let channelUUID = null;
 
       if (loginResult.ok) {
-        const userId = loginResult.userInfo.id;
-
         try {
-          const teams = await models.sequelize.query(
+          teams = await models.sequelize.query(
             'select * from teams as team join members as member on team.id = member.team_id where member.user_id = ?',
             {
-              replacements: [userId],
+              replacements: [loginResult.userInfo.id],
               model: models.Team,
               raw: true,
             },
           );
 
-          const team = teams[0];
+          team = teams[0];
 
-          if (team) {
+          if (team !== undefined) {
             const channel = await models.sequelize.query(
               "select uuid from channels where channels.name = 'general' and channels.team_id = ?",
               {
@@ -70,11 +129,26 @@ export default {
               },
             );
 
-            const channelUUID = channel[0][0].uuid;
+            channelUUID = channel[0][0].uuid;
+          } else {
+            console.log('No teams.');
+            teams = [];
+            team = '';
+            channelUUID = '';
+          }
+        } catch (err) {
+          console.log(`There was an error: ${err}`);
 
+          teams = [];
+          team = '';
+          channelUUID = '';
+        }
+
+        if (Array.isArray(teams)) {
+          if (teams.length >= 1) {
             result = {
               ok: loginResult.ok,
-              user: loginResult.userInfo,
+              user: loginResult.user,
               teamUUID: team.uuid,
               channelUUID: channelUUID,
               token: loginResult.token,
@@ -83,20 +157,29 @@ export default {
           } else {
             result = {
               ok: loginResult.ok,
-              user: loginResult.userInfo,
+              user: loginResult.user,
+              teamUUID: undefined,
               token: loginResult.token,
               refreshToken: loginResult.refreshToken,
             };
           }
-        } catch (err) {
-          console.log('There are no teams.');
+        } else {
           result = {
             ok: loginResult.ok,
-            user: loginResult.userInfo,
+            user: loginResult.user,
+            teamUUID: undefined,
             token: loginResult.token,
             refreshToken: loginResult.refreshToken,
           };
         }
+      } else {
+        result = {
+          ok: loginResult.ok,
+          user: loginResult.user,
+          teamUUID: undefined,
+          token: loginResult.token,
+          refreshToken: loginResult.refreshToken,
+        };
       }
 
       return result;
@@ -119,7 +202,6 @@ export default {
           user,
         };
       } catch (err) {
-        console.log('err: ', err);
         return {
           ok: false,
           errors: formatErrors(err, models),
