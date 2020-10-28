@@ -10,7 +10,7 @@ Online demo at http://slack-clone.craigstroman.com/.
 - Clone the repo at https://github.com/craigstroman/slack-clone-server.git.
 - CD into slack-clone-server.
 - Run `npm install` to install all required Node moduels.
-- Run `npm run start:dev` to start server environment.
+- Run `npm run start:dev` to start server development environment.
 
 ## Running in production
 
