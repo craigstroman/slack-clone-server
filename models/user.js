@@ -5,6 +5,9 @@ export default (sequelize, DataTypes) => {
     'user',
     {
       uuid: DataTypes.STRING,
+      firstName: DataTypes.STRING,
+      lastName: DataTypes.STRING,
+      phoneNumber: DataTypes.STRING,
       username: {
         type: DataTypes.STRING,
         unique: true,
@@ -41,7 +44,7 @@ export default (sequelize, DataTypes) => {
     },
     {
       hooks: {
-        afterValidate: async user => {
+        afterValidate: async (user) => {
           const hashedPassword = await bcrypt.hash(user.password, 12);
           // eslint-disable-next-line no-param-reassign
           user.password = hashedPassword;
@@ -50,7 +53,7 @@ export default (sequelize, DataTypes) => {
     },
   );
 
-  User.associate = models => {
+  User.associate = (models) => {
     User.belongsToMany(models.Team, {
       through: models.Member,
       foreignKey: {
