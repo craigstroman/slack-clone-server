@@ -208,5 +208,28 @@ export default {
         };
       }
     },
+    updateProfile: async (parent, args, { models }) => {
+      const { id, username, firstName, lastName, phoneNumber } = args;
+
+      try {
+        await models.sequelize.query(
+          'update users set username = ?, first_name = ?, last_name = ?, phone_number = ? where id = ?',
+          {
+            replacements: [username, firstName, lastName, phoneNumber, id],
+            model: models.User,
+            raw: true,
+          },
+        );
+
+        return {
+          ok: true,
+        };
+      } catch (err) {
+        return {
+          ok: false,
+          errors: formatErrors(err, models),
+        };
+      }
+    },
   },
 };
