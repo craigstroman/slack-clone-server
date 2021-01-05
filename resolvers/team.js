@@ -1,6 +1,7 @@
 import formatErrors from '../formatErrors';
 import requiresAuth from '../permissions';
 import shortid from 'shortid';
+import team from '../models/team';
 
 export default {
   Query: {
@@ -71,31 +72,47 @@ export default {
      */
     createTeam: requiresAuth.createResolver(async (parent, args, { models, user }) => {
       try {
-        const response = await models.sequelize.transaction(async () => {
-          args['uuid'] = shortid.generate();
-          args['channelUUID'] = '';
+        const teamName = args['name'];
+        const teamExists = await models.sequelize.query(
+          'select * from teams where name = :name and owner = :owner',
+          {
+            replacements: { name: teamName, owner: user.id },
+            model: models.Team,
+            raw: true,
+          },
+        );
 
-          const team = await models.Team.create({ ...args });
+        if (Array.isArray(teamExists)) {
+          if (!teamExists.length) {
+            const response = await models.sequelize.transaction(async () => {
+              args['uuid'] = shortid.generate();
+              args['channelUUID'] = '';
 
-          const channel = await models.Channel.create({
-            uuid: shortid.generate(),
-            name: 'general',
-            public: true,
-            teamId: team.id,
-          });
+              const team = await models.Team.create({ ...args, owner: user.id });
 
-          team.channelUUID = channel.uuid;
+              const channel = await models.Channel.create({
+                uuid: shortid.generate(),
+                name: 'general',
+                public: true,
+                teamId: team.id,
+              });
 
-          await models.Member.create({ teamId: team.id, userId: user.id, admin: true });
+              team.channelUUID = channel.uuid;
 
-          return team;
-        });
+              await models.Member.create({ teamId: team.id, userId: user.id, admin: true });
 
-        return {
-          ok: true,
-          team: response,
-          channelUUID: response.channelUUID,
-        };
+              return team;
+            });
+
+            return {
+              ok: true,
+              team: response,
+              channelUUID: response.channelUUID,
+            };
+          }
+        }
+
+        throw 'Team name already exists.';
       } catch (err) {
         console.log(err);
         return {
