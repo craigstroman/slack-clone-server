@@ -3,8 +3,8 @@ export default (sequelize, DataTypes) => {
     uuid: DataTypes.STRING,
     name: {
       type: DataTypes.STRING,
-      unique: true,
     },
+    owner: DataTypes.INTEGER,
   });
 
   Team.associate = (models) => {
