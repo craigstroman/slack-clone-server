@@ -29,6 +29,13 @@ app.set('view engine', 'pug');
 
 app.use('/static', express.static('public'));
 
+app.use(cors());
+app.all('/', function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', process.env.HOST);
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  next();
+});
+
 app.use(routes);
 
 app.locals.title = 'Slack Clone';
@@ -36,18 +43,14 @@ app.locals.content = 'A Slack clone using Express, GarphQL, and React.';
 app.locals.reactApp = reactApp;
 app.locals.env = process.env;
 
-// app.use(cors('*'));
-app.all('/', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  next();
- });
-
 const apolloServer = new ApolloServer({
   schema,
-  playground: process.env.NODE_ENV === 'development' ? {
-    graphqlEndpoint,
-  } : false,
+  playground:
+    process.env.NODE_ENV === 'development'
+      ? {
+          graphqlEndpoint,
+        }
+      : false,
   context: ({ req }) => {
     const token = req.headers['x-token'] || null;
 
