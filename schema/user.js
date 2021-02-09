@@ -39,7 +39,7 @@ export default `
   }
 
   type Mutation {
-    register(username: String!, email: String!, password: String!): RegisterResponse!
+    register(firstName: String!, lastName: String!, phoneNumber: String!, username: String!, email: String!, password: String!): RegisterResponse!
     login(email: String!, password: String!): LoginResponse!
     updateProfile(id: Int!, username: String!, firstName: String, lastName: String, phoneNumber: String): updateProfileResponse!
   }
