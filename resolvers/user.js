@@ -33,16 +33,38 @@ export default {
      */
     allUsers: (parent, args, { models }) => models.User.findAll(),
     /**
-     * Get's the logged in user information.
+     * Get's a users profile by username.
      *
      * @param      {Object}  parent       The parent.
      * @param      {Object}  args         The arguments.
      * @param      {Object}  user         The user.
      * @param      {Object}  models       The models.
      */
+
+    getUserByName: requiresAuth.createResolver((parent, args, { models }) => {
+      const username = args.username;
+
+      return models.User.findOne({ where: { username } });
+    }),
+
+    /**
+     * Gets information for logged in user.
+     *
+     * @param      {Object}  parent       The parent.
+     * @param      {Object}  args         The arguments.
+     * @param      {Object}  models       The models.
+     */
     me: requiresAuth.createResolver((parent, args, { user, models }) =>
       models.User.findOne({ where: { id: user.id } }),
     ),
+
+    /**
+     * Checks if a users email already exists.
+     *
+     * @param      {Object}  parent       The parent.
+     * @param      {Object}  args         The arguments.
+     * @param      {Object}  models       The models.
+     */
     verifyEmail: async (parent, args, { models }) => {
       try {
         const { email } = args;
@@ -61,6 +83,7 @@ export default {
         return false;
       }
     },
+
     /**
      * Verify's if a user exists or not.
      *
