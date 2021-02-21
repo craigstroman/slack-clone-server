@@ -14,6 +14,7 @@ export default `
     me: User!
     allUsers: [User!]!
     getUser(userId: Int!): User
+    getUserByName(username: String!): User
     verifyUser(username: String): Boolean
     verifyEmail(email: String): Boolean
   }
