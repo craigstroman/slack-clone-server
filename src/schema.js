@@ -1,5 +1,5 @@
 import path from 'path';
-import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas';
+import { fileLoader, mergeTypes, mergeResolvers } from 'merge-graphql-schemas'; // Use GraphQL Tools instead of merge schemas
 import { makeExecutableSchema } from 'graphql-tools';
 // import schemas from './schema/index';
 // import resolvers from './resolvers/index';
