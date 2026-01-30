@@ -7,8 +7,8 @@ export class User1769792398731 implements MigrationInterface {
                 CREATE TABLE IF NOT EXISTS public."user"
                 (
                     id integer NOT NULL DEFAULT nextval('user_id_seq'::regclass),
-                    "createdAt" timestamp without time zone NOT NULL DEFAULT now(),
-                    "updatedAt" timestamp without time zone NOT NULL DEFAULT now(),
+                    created_at timestamp without time zone NOT NULL DEFAULT now(),
+                    updated_at timestamp without time zone NOT NULL DEFAULT now(),
                     first_name character varying COLLATE pg_catalog."default" NOT NULL,
                     last_name character varying COLLATE pg_catalog."default" NOT NULL,
                     email character varying COLLATE pg_catalog."default" NOT NULL,
