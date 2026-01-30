@@ -1,121 +1,115 @@
-import path from 'path';
-import express from 'express';
-import { createServer } from 'http';
 import { ApolloServer } from 'apollo-server-express';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
-import { execute, subscribe } from 'graphql';
-import { refreshTokens } from './auth';
+import { buildSchema } from 'type-graphql';
+import { DataSource } from 'typeorm';
 import { User } from './entities/USER';
 import { Member } from './entities/MEMBER';
 import { Team } from './entities/TEAM';
 import { Text } from './entities/TEXT';
-import jwt from 'jsonwebtoken';
+import { createUserLoader } from './utils/createUserLoader';
+import { UserResolver } from './resolvers/user';
+import path from 'path';
+import express from 'express';
+import dotenv from 'dotenv';
 import cors from 'cors';
+import session from 'express-session';
 import routes from './routes/index';
-import models from './models/index';
-import schema from './schema';
 
-require('dotenv').config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const PORT = process.env.PORT || 3000;
-const SECRET1 = process.env.SECRET1;
-const SECRET2 = process.env.SECRET2;
-const graphqlEndpoint = process.env.GRAPHQL_ENDPOINT;
-const subscriptionEndpoint = process.env.SUBSCRIPTION_ENDPOINT;
-const graphql = `http://localhost:${PORT}${graphqlEndpoint}`;
-const subscriptions = `ws://localhost:${PORT}${subscriptionEndpoint}`;
-const reactApp = process.env.NODE_ENV === 'development' ? '/static/js/bundle.js' : '/static/js/main.min.js';
+const port = process.env.PORT;
+const nodeEnv = process.env.NODE_ENV;
 
-const app = express();
+const javascript = nodeEnv === 'development' ? '/static/js/bundle.js' : '/static/js/main.min.js';
 
-app.set('views', path.join(__dirname, './views'));
-app.set('view engine', 'pug');
+const main = async () => {
+  const nodeEnv = process.env.NODE_ENV;
+  const locals = {
+    javascript: nodeEnv === 'development' ? '/static/js/bundle.js' : '/static/js/main.min.js',
+  };
 
-app.use('/static', express.static('public'));
+  const secret: string = process.env.SECRET || '';
 
-app.use(cors());
-app.all('/', function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', process.env.HOST);
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
-  next();
-});
+  const app = express();
 
-app.use(routes);
+  app.set('trust proxy', 1);
 
-app.locals.title = 'Slack Clone';
-app.locals.content = 'A Slack clone using Express, GarphQL, and React.';
-app.locals.reactApp = reactApp;
-app.locals.env = process.env;
-
-const apolloServer = new ApolloServer({
-  schema,
-  playground:
-    process.env.NODE_ENV === 'development'
-      ? {
-          graphqlEndpoint,
-        }
-      : false,
-  context: ({ req }) => {
-    const token = req.headers['x-token'] || null;
-
-    if (token) {
-      try {
-        const { user } = jwt.verify(token, SECRET1);
-
-        return {
-          models,
-          user,
-          SECRET1,
-          SECRET2,
-        };
-      } catch (err) {
-        console.log('error: ');
-        console.log('err: ', err);
-      }
-    }
-    return {
-      models,
-      SECRET1,
-      SECRET2,
-    };
-  },
-});
-
-apolloServer.applyMiddleware({ app });
-const server = createServer(app);
-
-server.listen({ port: PORT }, () => {
-  console.log(`🚀 Server ready at ${graphql}`);
-  console.log(`🚀 Subscriptions ready at ${subscriptions}`);
-
-  new SubscriptionServer(
-    {
-      execute,
-      subscribe,
-      schema,
-      onConnect: async (connectionParams, webSocket) => {
-        const { token, refreshToken } = connectionParams;
-
-        if (token && refreshToken) {
-          try {
-            const { user } = jwt.verify(token, SECRET1);
-
-            return { user, models };
-          } catch (err) {
-            const newTokens = await refreshTokens(token, refreshToken, models, SECRET1, SECRET2);
-
-            return { user: newTokens.user, models };
-          }
-        }
-
-        return { models };
+  app.use(
+    session({
+      name: 'uid',
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+        httpOnly: false,
+        sameSite: 'lax',
+        secure: false,
       },
-      reconnect: true,
-    },
-    {
-      server,
-      reconnect: true,
-      path: '/subscriptions',
-    },
+      saveUninitialized: true,
+      secret: secret,
+      resave: false,
+    }),
   );
+
+  const conn = await new DataSource({
+    type: 'postgres',
+    database: process.env.DB_NAME,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    logging: true,
+    synchronize: true,
+    migrations: [path.join(__dirname, './migrations/*')],
+    entities: [User, Member, Team, Text],
+  });
+
+  await conn.runMigrations();
+
+  app.use(
+    cors({
+      origin: nodeEnv === 'production' ? ['https://slack-clone.craigstroman.com'] : ['http://localhost:8080'],
+      credentials: true,
+      methods: ['GET', 'POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    }),
+  );
+
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [UserResolver],
+      validate: false,
+    }),
+    context: async ({ req, res }) => ({
+      req: req,
+      res: res,
+      userLoader: createUserLoader(),
+    }),
+  });
+
+  app.set('trust proxy', 1);
+
+  app.use(routes);
+
+  app.use('/static', express.static('public'));
+
+  app.set('views', path.join(__dirname, './views'));
+  app.set('view engine', 'pug');
+
+  app.locals = locals;
+
+  app.locals.javascript = javascript;
+
+  app.locals.title = 'LiReddit';
+  app.locals.description = 'A Reddit clone.';
+
+  await apolloServer.start();
+
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
+
+  app.listen(port, () => {
+    console.log(`Server started on localhost:${port}`);
+  });
+};
+
+main().catch((error) => {
+  console.error(error);
 });
