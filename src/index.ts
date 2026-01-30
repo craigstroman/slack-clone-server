@@ -59,6 +59,8 @@ const main = async () => {
     entities: [User, Member, Team, Text],
   });
 
+  conn.initialize();
+
   await conn.runMigrations();
 
   app.use(
