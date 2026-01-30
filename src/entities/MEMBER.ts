@@ -11,6 +11,10 @@ import {
 @ObjectType()
 @Entity()
 export class Member extends BaseEntity {
+  @Field()
+  @PrimaryGeneratedColumn()
+  id!: number;
+
   @Field(() => String)
   @CreateDateColumn()
   created_at = new Date();
