@@ -11,9 +11,16 @@ import {
   Query,
 } from 'type-graphql';
 import { MyContext } from 'src/types';
+import { DataSource } from 'typeorm';
 import { User } from '../entities/USER';
-import { getConnection } from 'typeorm';
+import { Member } from '../entities/MEMBER';
+import { Team } from '../entities/TEAM';
+import { Text } from '../entities/TEXT';
+import path from 'path';
+import dotenv from 'dotenv';
 import argon2 from 'argon2';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 @InputType()
 class UsernameRegisterInput {
@@ -76,7 +83,16 @@ export class UserResolver {
     }
 
     const hashedPassword = await argon2.hash(options.password);
-    const result = await getConnection()
+    const result = await new DataSource({
+      type: 'postgres',
+      database: process.env.DB_NAME,
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      logging: true,
+      synchronize: true,
+      migrations: [path.join(__dirname, './migrations/*')],
+      entities: [User, Member, Team, Text],
+    })
       .createQueryBuilder()
       .insert()
       .into(User)
