@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@urql/exchange-graphcache": "^8.1.0",
-    "apollo-server-express": "^3.13.0",
+    "apollo-server-express": "2.16.1",
     "argon2": "^0.44.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
@@ -46,7 +46,7 @@
     "shortid": "^2.2.15",
     "subscriptions-transport-ws": "^0.9.17",
     "type-graphql": "^2.0.0-rc.2",
-    "typeorm": "0.2.25"
+    "typeorm": "^0.3.28"
   },
   "repository": "https://github.com/craigstroman/slack-clone-server.git"
 }
