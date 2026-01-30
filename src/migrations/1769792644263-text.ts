@@ -6,9 +6,9 @@ export class Text1769792644263 implements MigrationInterface {
       `
                 CREATE TABLE IF NOT EXISTS public."user"
                 (
-                    "createdAt" timestamp without time zone NOT NULL DEFAULT now(),
-                    "updatedAt" timestamp without time zone NOT NULL DEFAULT now(),
-                     text character varying COLLATE pg_catalog."default" NOT NULL,
+                    created_at timestamp without time zone NOT NULL DEFAULT now(),
+                    updated_at timestamp without time zone NOT NULL DEFAULT now(),
+                    text character varying COLLATE pg_catalog."default" NOT NULL,
                 ); 
             `,
     );
