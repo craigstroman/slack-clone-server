@@ -13,7 +13,7 @@ import {
 export class Team extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  uuid!: number;
+  id!: number;
 
   @Field(() => String)
   @CreateDateColumn()
