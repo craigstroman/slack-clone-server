@@ -8,7 +8,8 @@
     "start": "NODE_ENV=production node ./build/index.js",
     "live:server": "NODE_ENV=development nodemon dist/index.js",
     "copy-files:server": "copyfiles -f ./views/*.pug ./build/views & copyfiles ./.env ./build",
-    "prod:server": "babel -d ./build ./ -s --ignore node_modules,build,views & npm run copy-files:server"
+    "prod:server": "babel -d ./build ./ -s --ignore node_modules,build,views & npm run copy-files:server",
+    "typeorm": "ts-node ./node_modules/typeorm/cli"
   },
   "author": "Craig Stroman",
   "license": "ISC",
