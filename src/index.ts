@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { DataSource } from 'typeorm';
@@ -6,7 +7,9 @@ import { Member } from './entities/MEMBER';
 import { Team } from './entities/TEAM';
 import { Text } from './entities/TEXT';
 import { createUserLoader } from './utils/createUserLoader';
+import { HelloResolver } from './resolvers/hello';
 import { UserResolver } from './resolvers/user';
+import Redis from 'ioredis';
 import path from 'path';
 import express from 'express';
 import dotenv from 'dotenv';
@@ -18,6 +21,8 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const port = process.env.PORT;
 const nodeEnv = process.env.NODE_ENV;
+const redis = new Redis();
+const RedisStore = require('connect-redis')(session);
 
 const javascript = nodeEnv === 'development' ? '/static/js/bundle.js' : '/static/js/main.min.js';
 
@@ -36,6 +41,10 @@ const main = async () => {
   app.use(
     session({
       name: 'uid',
+      store: new RedisStore({
+        client: redis,
+        disableTouch: true,
+      }),
       cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         httpOnly: false,
@@ -48,24 +57,9 @@ const main = async () => {
     }),
   );
 
-  const conn = await new DataSource({
-    type: 'postgres',
-    database: process.env.DB_NAME,
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    logging: true,
-    synchronize: true,
-    migrations: [path.join(__dirname, './migrations/*')],
-    entities: [User, Member, Team, Text],
-  });
-
-  conn.initialize();
-
-  await conn.runMigrations();
-
   app.use(
     cors({
-      origin: nodeEnv === 'production' ? ['https://slack-clone.craigstroman.com'] : ['http://localhost:8080'],
+      origin: nodeEnv === 'production' ? ['https://slack-clone.craigstroman.com'] : ['http://localhost:9000'],
       credentials: true,
       methods: ['GET', 'POST', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
@@ -74,7 +68,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver],
+      resolvers: [UserResolver, HelloResolver],
       validate: false,
     }),
     context: async ({ req, res }) => ({
@@ -97,19 +91,36 @@ const main = async () => {
 
   app.locals.javascript = javascript;
 
-  app.locals.title = 'LiReddit';
-  app.locals.description = 'A Reddit clone.';
+  app.locals.title = 'Slack Clone';
+  app.locals.description = 'A Slack clone.';
 
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({
-    app,
-    cors: false,
+  const conn = await new DataSource({
+    type: 'postgres',
+    database: process.env.DB_NAME,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    logging: true,
+    synchronize: true,
+    migrations: [path.join(__dirname, './migrations/*')],
+    entities: [User, Member, Team, Text],
   });
+
+  await conn.initialize();
+
+  // TODO: Figure out how to correctly initialize typeorm, I think that is why it never get's to app.listen.
+
+  await conn.runMigrations();
 
   app.listen(port, () => {
     console.log(`Server started on localhost:${port}`);
   });
+
+  // apolloServer.applyMiddleware({
+  //   app,
+  //   cors: false,
+  // });
 };
 
 main().catch((error) => {
