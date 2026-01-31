@@ -4,11 +4,11 @@ export class Text1769792644263 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `
-                CREATE TABLE IF NOT EXISTS public."user"
+                CREATE TABLE IF NOT EXISTS public."text"
                 (
                     created_at timestamp without time zone NOT NULL DEFAULT now(),
                     updated_at timestamp without time zone NOT NULL DEFAULT now(),
-                    text character varying COLLATE pg_catalog."default" NOT NULL,
+                    text character varying COLLATE pg_catalog."default" NOT NULL
                 ); 
             `,
     );
