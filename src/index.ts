@@ -36,8 +36,6 @@ const main = async () => {
 
   const app = express();
 
-  app.set('trust proxy', 1);
-
   app.use(
     session({
       name: 'uid',
@@ -59,7 +57,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: nodeEnv === 'production' ? ['https://slack-clone.craigstroman.com'] : ['http://localhost:9000'],
+      origin: nodeEnv === 'production' ? ['https://slack-clone.craigstroman.com'] : ['http://localhost:9001'],
       credentials: true,
       methods: ['GET', 'POST', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
@@ -96,6 +94,11 @@ const main = async () => {
 
   await apolloServer.start();
 
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
+
   const conn = await new DataSource({
     type: 'postgres',
     database: process.env.DB_NAME,
@@ -109,18 +112,11 @@ const main = async () => {
 
   await conn.initialize();
 
-  // TODO: Figure out how to correctly initialize typeorm, I think that is why it never get's to app.listen.
-
   await conn.runMigrations();
 
   app.listen(port, () => {
     console.log(`Server started on localhost:${port}`);
   });
-
-  // apolloServer.applyMiddleware({
-  //   app,
-  //   cors: false,
-  // });
 };
 
 main().catch((error) => {
