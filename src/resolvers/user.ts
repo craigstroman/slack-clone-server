@@ -10,12 +10,12 @@ import {
   Root,
   Query,
 } from 'type-graphql';
-import { MyContext } from 'src/types';
 import { DataSource } from 'typeorm';
+import { UsernamePasswordInput } from './UsernamePasswordInput';
+import { MyContext } from 'src/types';
 import { User } from '../entities/USER';
-import { Member } from '../entities/MEMBER';
-import { Team } from '../entities/TEAM';
-import { Text } from '../entities/TEXT';
+import { validateRegister } from '../utils/validateRegister';
+import { appDataSource } from '../appDataSource';
 import path from 'path';
 import dotenv from 'dotenv';
 import argon2 from 'argon2';
@@ -57,61 +57,34 @@ class UserResponse {
 export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
-    @Arg('options') options: UsernameRegisterInput,
-    @Ctx() { req, em }: MyContext,
+    @Arg('options') options: UsernamePasswordInput,
+    @Ctx() { req }: MyContext,
   ): Promise<UserResponse> {
-    if (options.username.length <= 2) {
-      return {
-        errors: [
-          {
-            field: 'username',
-            message: 'Username must be greater than 2 characters long.',
-          },
-        ],
-      };
-    }
-
-    if (options.password.length <= 2) {
-      return {
-        errors: [
-          {
-            field: 'password',
-            message: 'Password length must be greater than 2 characters long.',
-          },
-        ],
-      };
+    const errors = validateRegister(options);
+    if (errors) {
+      return { errors };
     }
 
     const hashedPassword = await argon2.hash(options.password);
-    const result = await new DataSource({
-      type: 'postgres',
-      database: process.env.DB_NAME,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      logging: true,
-      synchronize: true,
-      migrations: [path.join(__dirname, './migrations/*')],
-      entities: [User, Member, Team, Text],
-    })
-      .createQueryBuilder()
-      .insert()
-      .into(User)
-      .values({
-        first_name: options.first_name,
-        last_name: options.last_name,
-        username: options.username,
-        email: options.email,
-        password: hashedPassword,
-      })
-      .returning('*')
-      .execute();
-
-    const user = result.raw[0];
-
+    let user;
     try {
-      await em.persistAndFlush(user);
-    } catch (error) {
-      if (error.code === '23505') {
+      // User.create({}).save()
+      const result = await appDataSource
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values({
+          username: options.username,
+          email: options.email,
+          password: hashedPassword,
+        })
+        .returning('*')
+        .execute();
+      user = result.raw[0];
+    } catch (err) {
+      //|| err.detail.includes("already exists")) {
+      // duplicate username error
+      if (err.code === '23505') {
         return {
           errors: [
             {
@@ -123,6 +96,9 @@ export class UserResolver {
       }
     }
 
+    // store user id session
+    // this will set a cookie on the user
+    // keep them logged in
     req.session.userId = user.id;
 
     return { user };
