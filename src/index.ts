@@ -1,14 +1,10 @@
 import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
-import { DataSource } from 'typeorm';
-import { User } from './entities/USER';
-import { Member } from './entities/MEMBER';
-import { Team } from './entities/TEAM';
-import { Text } from './entities/TEXT';
 import { createUserLoader } from './utils/createUserLoader';
 import { HelloResolver } from './resolvers/hello';
 import { UserResolver } from './resolvers/user';
+import { appDataSource } from './appDataSource';
 import Redis from 'ioredis';
 import path from 'path';
 import express from 'express';
@@ -99,16 +95,7 @@ const main = async () => {
     cors: false,
   });
 
-  const conn = await new DataSource({
-    type: 'postgres',
-    database: process.env.DB_NAME,
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    logging: true,
-    synchronize: true,
-    migrations: [path.join(__dirname, './migrations/*')],
-    entities: [User, Member, Team, Text],
-  });
+  const conn = await appDataSource;
 
   await conn.initialize();
 
