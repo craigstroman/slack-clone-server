@@ -60,6 +60,7 @@ export class UserResolver {
     @Arg('options') options: UsernamePasswordInput,
     @Ctx() { req }: MyContext,
   ): Promise<UserResponse> {
+    console.log('options: ', options);
     const errors = validateRegister(options);
     if (errors) {
       return { errors };
@@ -74,6 +75,9 @@ export class UserResolver {
         .insert()
         .into(User)
         .values({
+          first_name: options.first_name,
+          last_name: options.last_name,
+          phone_number: options.phone_number,
           username: options.username,
           email: options.email,
           password: hashedPassword,
