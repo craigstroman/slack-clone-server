@@ -2,7 +2,7 @@
 
 Based on the tutorial from https://awesomereact.com/playlists/slack-clone-using-graphql/0MKJ7JbVnFc.
 
-Online demo at http://slack-clone.craigstroman.com/.
+Online demo at - Not uploaded yet
 
 ## Running locally
 
