@@ -21,3 +21,14 @@ Online demo at http://slack-clone.craigstroman.com/.
 - Then deploy that directory and you can start it by running `npm start`.
 
 Note: This is a work in progress. I'm continuing to update this and add features.
+
+## Version History
+
+###### Version 2.0.0
+
+- Started using TypeScript
+- Switched to using typeorm
+- Upgraded version of GraphQL
+- Started using URQL
+- Started using Argon2 instead of Bcrypt
+- Started using Redis
