@@ -53,7 +53,8 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: nodeEnv === 'production' ? ['https://slack-clone.craigstroman.com'] : ['http://localhost:9001'],
+      origin:
+        nodeEnv === 'production' ? ['https://slack-clone.craigstroman.com'] : [`http://localhost:${port}`],
       credentials: true,
       methods: ['GET', 'POST', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
