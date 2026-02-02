@@ -4,6 +4,9 @@ import { Member } from './entities/MEMBER';
 import { Team } from './entities/TEAM';
 import { Text } from './entities/TEXT';
 import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const appDataSource = new DataSource({
   type: 'postgres',
