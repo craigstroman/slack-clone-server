@@ -48,7 +48,8 @@
     "shortid": "^2.2.15",
     "subscriptions-transport-ws": "^0.9.17",
     "type-graphql": "1.0.0-rc.3",
-    "typeorm": "^0.3.28"
+    "typeorm": "^0.3.28",
+    "uuid": "^13.0.0"
   },
   "repository": "https://github.com/craigstroman/slack-clone-server.git"
 }
