@@ -10,12 +10,13 @@ import {
   Root,
   Query,
 } from 'type-graphql';
-import { DataSource } from 'typeorm';
+import { v4 } from 'uuid';
 import { UsernamePasswordInput } from './UsernamePasswordInput';
 import { MyContext } from 'src/types';
 import { User } from '../entities/USER';
 import { validateRegister } from '../utils/validateRegister';
 import { appDataSource } from '../appDataSource';
+import { FORGET_PASSWORD_PREFIX } from '../constants';
 import path from 'path';
 import dotenv from 'dotenv';
 import argon2 from 'argon2';
@@ -150,5 +151,36 @@ export class UserResolver {
     return {
       user,
     };
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise((resolve) =>
+      req.session.destroy((err: any) => {
+        res.clearCookie('uid');
+        if (err) {
+          console.log('There was an issue destroying the session.');
+          console.log('err: ', err);
+          resolve(false);
+          return;
+        }
+        resolve(true);
+      }),
+    );
+  }
+
+  @Mutation(() => String)
+  async forgotPassword(@Arg('email') email: string, @Ctx() { redis }: MyContext) {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return 'Error';
+    }
+
+    const token = v4();
+
+    await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
+
+    return `http://localhost:${port}/change-password/${token}`;
   }
 }
