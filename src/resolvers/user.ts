@@ -83,13 +83,30 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async register(
-    @Arg('options') options: UsernamePasswordInput,
+    @Arg('options') options: UsernameRegisterInput,
     @Ctx() { req }: MyContext,
   ): Promise<UserResponse> {
     console.log('options: ', options);
-    const errors = validateRegister(options);
-    if (errors) {
-      return { errors };
+    if (options.username.length <= 2) {
+      return {
+        errors: [
+          {
+            field: 'username',
+            message: 'Username must be greater than 2 characters long.',
+          },
+        ],
+      };
+    }
+
+    if (options.password.length <= 2) {
+      return {
+        errors: [
+          {
+            field: 'password',
+            message: 'Password length must be greater than 2 characters long.',
+          },
+        ],
+      };
     }
 
     const hashedPassword = await argon2.hash(options.password);
