@@ -56,6 +56,31 @@ class UserResponse {
 
 @Resolver(User)
 export class UserResolver {
+  userIdNum?: any;
+
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    // this is the current user and its ok to show them their own email
+    if (req.session.userId === user.id) {
+      return user.email;
+    }
+    // current user wants to see someone elses email
+    return '';
+  }
+
+  @Query(() => User)
+  async me(@Ctx() { req }: MyContext) {
+    // You are not logged in
+    if (!req.session.userId) {
+      return null;
+    }
+
+    const id = req.session.userId;
+
+    const user = await User.findOne(id);
+
+    return user;
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UsernamePasswordInput,
@@ -167,6 +192,66 @@ export class UserResolver {
         resolve(true);
       }),
     );
+  }
+
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg('token') token: string,
+    @Arg('new_password') new_password: string,
+    @Ctx() { redis, em, req }: MyContext,
+  ): Promise<UserResponse> {
+    if (new_password.length <= 2) {
+      return {
+        errors: [
+          {
+            field: 'newPassword',
+            message: 'length must be greater than 2',
+          },
+        ],
+      };
+    }
+
+    const key = FORGET_PASSWORD_PREFIX + token;
+    const userId = await redis.get(key);
+    if (!userId) {
+      return {
+        errors: [
+          {
+            field: 'token',
+            message: 'token expired',
+          },
+        ],
+      };
+    }
+
+    const userIdNum = parseInt(userId);
+    const user = await User.findOne(userIdNum);
+
+    if (!user) {
+      return {
+        errors: [
+          {
+            field: 'token',
+            message: 'user no longer exists',
+          },
+        ],
+      };
+    }
+
+    user.password = await argon2.hash(new_password);
+    await User.update(
+      { id: userIdNum },
+      {
+        password: await argon2.hash(new_password),
+      },
+    );
+
+    await redis.del(key);
+
+    // log in user after change password
+    req.session.userId = user.id;
+
+    return { user };
   }
 
   @Mutation(() => String)
