@@ -30,6 +30,8 @@ class UsernameRegisterInput {
   @Field()
   last_name: string;
   @Field()
+  phone_number: string;
+  @Field()
   email: string;
   @Field()
   username: string;
@@ -86,6 +88,7 @@ export class UserResolver {
     @Arg('options') options: UsernameRegisterInput,
     @Ctx() { req }: MyContext,
   ): Promise<UserResponse> {
+    console.log('register: ');
     console.log('options: ', options);
     if (options.username.length <= 2) {
       return {
