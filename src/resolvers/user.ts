@@ -11,10 +11,8 @@ import {
   Query,
 } from 'type-graphql';
 import { v4 } from 'uuid';
-import { UsernamePasswordInput } from './UsernamePasswordInput';
 import { MyContext } from 'src/types';
 import { User } from '../entities/USER';
-import { validateRegister } from '../utils/validateRegister';
 import { appDataSource } from '../appDataSource';
 import { FORGET_PASSWORD_PREFIX } from '../constants';
 import path from 'path';
@@ -22,6 +20,8 @@ import dotenv from 'dotenv';
 import argon2 from 'argon2';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+const port: number | string = process.env.PORT ? process.env.PORT : 0;
 
 @InputType()
 class UsernameRegisterInput {
@@ -88,8 +88,6 @@ export class UserResolver {
     @Arg('options') options: UsernameRegisterInput,
     @Ctx() { req }: MyContext,
   ): Promise<UserResponse> {
-    console.log('register: ');
-    console.log('options: ', options);
     if (options.username.length <= 2) {
       return {
         errors: [
@@ -214,6 +212,23 @@ export class UserResolver {
     );
   }
 
+  @Mutation(() => String)
+  async forgotPassword(@Arg('email') email: string, @Ctx() { redis }: MyContext) {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return 'Error';
+    }
+
+    const token = v4();
+
+    const url: string = `http://localhost:${port}/change-password/${token}`;
+
+    await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
+
+    return url;
+  }
+
   @Mutation(() => UserResponse)
   async changePassword(
     @Arg('token') token: string,
@@ -272,20 +287,5 @@ export class UserResolver {
     req.session.userId = user.id;
 
     return { user };
-  }
-
-  @Mutation(() => String)
-  async forgotPassword(@Arg('email') email: string, @Ctx() { redis }: MyContext) {
-    const user = await User.findOne({ where: { email } });
-
-    if (!user) {
-      return 'Error';
-    }
-
-    const token = v4();
-
-    await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
-
-    return `http://localhost:${port}/change-password/${token}`;
   }
 }
