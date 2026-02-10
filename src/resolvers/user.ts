@@ -224,8 +224,6 @@ export class UserResolver {
 
     const url: string = `http://localhost:${port}/change-password/${token}`;
 
-    await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
-
     return url;
   }
 
