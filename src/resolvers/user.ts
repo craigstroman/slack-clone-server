@@ -222,9 +222,9 @@ export class UserResolver {
 
     const token = v4();
 
-    const url: string = `http://localhost:${port}/change-password/${token}`;
+    const url: string = `http://localhost:8080/change-password/${token}`;
 
-    await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
+    // await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
 
     return url;
   }
@@ -258,6 +258,8 @@ export class UserResolver {
         ],
       };
     }
+
+    // TODO: Figure out why userIDNum isn't working here when it is working in the reddit server app
 
     const userIdNum = parseInt(userId);
     const user = await User.findOne(userIdNum);
