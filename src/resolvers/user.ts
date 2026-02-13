@@ -21,7 +21,7 @@ import argon2 from 'argon2';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const port: number | string = process.env.PORT ? process.env.PORT : 0;
+const frontEndPort: number | string = process.env.FRONT_END_PORT ? process.env.FRONT_END_PORT : 0;
 
 @InputType()
 class UsernameRegisterInput {
@@ -222,8 +222,15 @@ export class UserResolver {
 
     const token = v4();
 
-    const url: string = `http://localhost:8080/change-password/${token}`;
+    let url: string = '';
 
+    if (process.env.NODE_ENV === 'development') {
+      url = `http://localhost:${frontEndPort}/change-password/${token}`;
+    } else {
+      url = `https://slack-clone.craigstroman.com/change-password/${token}`;
+    }
+
+    //TODO: Figure out why the following is not working when I put it around a try catch block.
     // await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
 
     return url;
@@ -262,6 +269,7 @@ export class UserResolver {
     // TODO: Figure out why userIDNum isn't working here when it is working in the reddit server app
 
     const userIdNum = parseInt(userId);
+    console.log('userIdNum: ', userIdNum);
     const user = await User.findOne(userIdNum);
 
     if (!user) {
