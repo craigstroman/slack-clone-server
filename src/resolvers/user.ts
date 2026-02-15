@@ -230,8 +230,7 @@ export class UserResolver {
       url = `https://slack-clone.craigstroman.com/change-password/${token}`;
     }
 
-    //TODO: Figure out why the following is not working when I put it around a try catch block.
-    // await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
+    await redis.set(FORGET_PASSWORD_PREFIX + token, user.id, 'ex', 1000 * 60 * 60 * 24 * 3); // 3 days
 
     return url;
   }
