@@ -68,6 +68,7 @@ const main = async () => {
     context: async ({ req, res }) => ({
       req: req,
       res: res,
+      redis: redis,
       userLoader: createUserLoader(),
     }),
   });
