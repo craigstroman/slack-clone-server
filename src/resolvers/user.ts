@@ -1,15 +1,4 @@
-import {
-  Resolver,
-  Mutation,
-  Arg,
-  InputType,
-  Field,
-  Ctx,
-  ObjectType,
-  FieldResolver,
-  Root,
-  Query,
-} from 'type-graphql';
+import { Resolver, Mutation, Arg, InputType, Field, Ctx, ObjectType, Root, Query } from 'type-graphql';
 import { v4 } from 'uuid';
 import { MyContext } from 'src/types';
 import { User } from '../entities/USER';
