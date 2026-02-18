@@ -34,8 +34,4 @@ export class Team extends BaseEntity {
   @Field(() => Number)
   @Column()
   user_id!: number;
-
-  @Field(() => Number)
-  @Column()
-  team_id!: number;
 }
