@@ -6,7 +6,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  OneToMany,
 } from 'typeorm';
+import { Team } from './TEAM';
 
 @ObjectType()
 @Entity()
@@ -46,4 +48,7 @@ export class User extends BaseEntity {
   @Field()
   @Column()
   password!: string;
+
+  @OneToMany(() => Team, (team) => team.user_id)
+  teams: Team[];
 }
