@@ -9,6 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Team } from './TEAM';
+import { Member } from './MEMBER';
 
 @ObjectType()
 @Entity()
@@ -51,4 +52,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Team, (team) => team.user_id)
   teams: Team[];
+
+  @OneToMany(() => Member, (member) => member.user_id)
+  members: Member[];
 }
