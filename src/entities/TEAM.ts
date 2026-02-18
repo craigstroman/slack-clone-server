@@ -30,4 +30,8 @@ export class Team extends BaseEntity {
   @Field(() => String)
   @Column()
   owner!: string;
+
+  @Field(() => Number)
+  @Column()
+  user_id!: number;
 }
