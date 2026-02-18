@@ -23,7 +23,11 @@ export class Member extends BaseEntity {
   @UpdateDateColumn()
   updated_at = new Date();
 
-  @Field(() => String)
+  @Field(() => Number)
   @Column()
-  owner!: string;
+  team!: number;
+
+  @Field(() => Number)
+  @Column()
+  user_id!: number;
 }
