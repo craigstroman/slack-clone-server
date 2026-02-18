@@ -27,9 +27,9 @@ export class Team extends BaseEntity {
   @Column()
   name!: string;
 
-  @Field(() => String)
+  @Field(() => Number)
   @Column()
-  owner!: string;
+  owner!: number;
 
   @Field(() => Number)
   @Column()
