@@ -4,6 +4,7 @@ import { buildSchema } from 'type-graphql';
 import { createUserLoader } from './utils/createUserLoader';
 import { HelloResolver } from './resolvers/hello';
 import { UserResolver } from './resolvers/user';
+import { TeamResolver } from './resolvers/team';
 import { appDataSource } from './appDataSource';
 import Redis from 'ioredis';
 import path from 'path';
@@ -62,7 +63,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver, HelloResolver],
+      resolvers: [UserResolver, TeamResolver, HelloResolver],
       validate: false,
     }),
     context: async ({ req, res }) => ({
