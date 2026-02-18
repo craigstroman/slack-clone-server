@@ -14,9 +14,9 @@ class TeamCreateInput {
   @Field()
   name: string;
   @Field()
-  owner: string;
+  owner: number;
   @Field()
-  user_id: string;
+  user_id: number;
 }
 
 @ObjectType()
@@ -53,6 +53,7 @@ export class TeamResolver {
         ],
       };
     }
+    g;
 
     let team;
     try {
