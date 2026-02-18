@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
+// TODO: Continue working on team resolver and create_team mutation so I can create a test team
+
 @InputType()
 class TeamCreateInput {
   @Field()
