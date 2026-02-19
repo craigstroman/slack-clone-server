@@ -39,7 +39,7 @@ export class User extends BaseEntity {
   phone_number!: string;
 
   @Field(() => String)
-  @Column()
+  @Column({ unique: true })
   username!: string;
 
   @Field(() => String)
