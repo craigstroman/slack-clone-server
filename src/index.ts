@@ -13,13 +13,14 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import session from 'express-session';
 import routes from './routes/index';
+import connectRedis from 'connect-redis';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const port = process.env.PORT;
 const nodeEnv = process.env.NODE_ENV;
 const redis = new Redis();
-const RedisStore = require('connect-redis')(session);
+const RedisStore = connectRedis(session);
 
 const javascript = nodeEnv === 'development' ? '/static/js/bundle.js' : '/static/js/main.min.js';
 
