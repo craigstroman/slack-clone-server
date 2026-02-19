@@ -1,13 +1,14 @@
-import { Resolver, Mutation, Arg, InputType, Field, Ctx, ObjectType } from 'type-graphql';
+import { Resolver, Mutation, UseMiddleware, Arg, InputType, Field, Ctx, ObjectType } from 'type-graphql';
 import { MyContext } from 'src/types';
 import { Team } from '../entities/TEAM';
 import { appDataSource } from '../appDataSource';
 import path from 'path';
 import dotenv from 'dotenv';
+import { isAuth } from '../middleware/isAuth';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-// TODO: Continue working on team resolver and create_team mutation so I can create a test team
+// TODO: Continue working on team resolver
 
 @InputType()
 class TeamCreateInput {
@@ -20,7 +21,7 @@ class TeamCreateInput {
 }
 
 @ObjectType()
-class FieldError {
+class TeamError {
   @Field()
   field: string;
   @Field()
@@ -29,7 +30,7 @@ class FieldError {
 
 @ObjectType()
 class TeamResponse {
-  @Field(() => [FieldError], { nullable: true })
+  @Field(() => [TeamError], { nullable: true })
   errors?: FieldError[];
 
   @Field(() => Team, { nullable: true })
@@ -39,6 +40,7 @@ class TeamResponse {
 @Resolver(Team)
 export class TeamResolver {
   @Mutation(() => TeamResponse)
+  @UseMiddleware(isAuth)
   async create_team(
     @Arg('options') options: TeamCreateInput,
     @Ctx() { req }: MyContext,
@@ -53,7 +55,8 @@ export class TeamResolver {
         ],
       };
     }
-    g;
+
+    console.log('req.session.userId: ', req.session.userId);
 
     let team;
     try {
@@ -65,6 +68,7 @@ export class TeamResolver {
         .values({
           name: options.name,
           owner: options.owner,
+          user_id: 1,
         })
         .returning('*')
         .execute();
