@@ -35,7 +35,7 @@
     "connect-redis": "5.0.0",
     "cors": "^2.8.5",
     "dataloader": "^2.2.3",
-    "express": "4.17.1",
+    "express": "4.22.0",
     "express-session": "1.17.1",
     "graphql": "15.3.0",
     "graphql-scalars": "1.24.2",
