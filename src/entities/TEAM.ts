@@ -24,7 +24,7 @@ export class Team extends BaseEntity {
   updated_at = new Date();
 
   @Field(() => String)
-  @Column()
+  @Column({ unique: true })
   name!: string;
 
   @Field(() => Number)
