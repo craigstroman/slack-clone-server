@@ -41,7 +41,7 @@
     "graphql-scalars": "1.24.2",
     "graphql-subscriptions": "^3.0.0",
     "ioredis": "4.17.3",
-    "minimatch": "10.0.3",
+    "minimatch": "10.2.1",
     "pg": "^8.3.0",
     "pug": "^3.0.0",
     "reflect-metadata": "0.1.13",
