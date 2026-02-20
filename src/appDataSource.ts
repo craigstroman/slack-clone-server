@@ -1,4 +1,4 @@
-import { DataSource } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { User } from './entities/USER';
 import { Member } from './entities/MEMBER';
 import { Team } from './entities/TEAM';
@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-export const appDataSource = new DataSource({
+const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   database: process.env.DB_NAME,
   username: process.env.DB_USER,
@@ -17,4 +17,6 @@ export const appDataSource = new DataSource({
   synchronize: true,
   migrations: [path.join(__dirname, './migrations/*')],
   entities: [User, Member, Team, Text],
-});
+};
+
+export const appDataSource = new DataSource(dataSourceOptions);
