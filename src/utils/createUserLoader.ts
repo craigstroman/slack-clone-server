@@ -1,5 +1,5 @@
 import DataLoader from 'dataloader';
-import { User } from '../entities/USER';
+import { User } from '../entities/index';
 import { In } from 'typeorm';
 
 // [1, 78, 8, 9]
