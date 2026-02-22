@@ -48,11 +48,11 @@ export class User extends BaseEntity {
 
   @Field(() => String)
   @CreateDateColumn()
-  createdAt = new Date();
+  created_at = new Date();
 
   @Field(() => String)
   @UpdateDateColumn()
-  updatedAt = new Date();
+  updated_at = new Date();
 }
 
 //Team entity
