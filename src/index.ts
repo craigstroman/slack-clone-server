@@ -73,7 +73,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: nodeEnv === 'production' ? ['https://lireddit.craigstroman.com'] : ['http://localhost:8080'],
+      origin: nodeEnv === 'production' ? ['https://slack-clone.craigstroman.com'] : ['http://localhost:8080'],
       credentials: true,
       methods: ['GET', 'POST', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
