@@ -12,10 +12,7 @@ import connectRedis from 'connect-redis';
 import { HelloResolver } from './resolvers/hello';
 import { UserResolver } from './resolvers/user';
 import { TeamResolver } from './resolvers/team';
-import { User } from './entities/USER';
-import { Member } from './entities/MEMBER';
-import { Team } from './entities/TEAM';
-import { Text } from './entities/TEXT';
+import { User, Member, Team, Text } from './entities/index';
 import routes from './routes/index';
 import { createUserLoader } from './utils/createUserLoader';
 
