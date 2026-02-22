@@ -1,8 +1,8 @@
 import { Resolver, Mutation, Arg, InputType, Field, Ctx, ObjectType, Root, Query } from 'type-graphql';
 import { v4 } from 'uuid';
-import { MyContext } from 'src/types';
-import { User } from '../entities/USER';
-import { appDataSource } from '../appDataSource';
+import { getConnection } from 'typeorm';
+import { MyContext } from '../types';
+import { User } from '../entities/index';
 import { FORGET_PASSWORD_PREFIX } from '../constants';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -134,7 +134,7 @@ export class UserResolver {
     let user;
     try {
       // User.create({}).save()
-      const result = await appDataSource
+      const result = await getConnection()
         .createQueryBuilder()
         .insert()
         .into(User)
