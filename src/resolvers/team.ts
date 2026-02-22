@@ -1,10 +1,10 @@
 import { Resolver, Mutation, UseMiddleware, Arg, InputType, Field, Ctx, ObjectType } from 'type-graphql';
-import { MyContext } from 'src/types';
-import { Team } from '../entities/TEAM';
-import { appDataSource } from '../appDataSource';
+import { MyContext } from '../types';
+import { Team } from '../entities/index';
 import path from 'path';
 import dotenv from 'dotenv';
 import { isAuth } from '../middleware/isAuth';
+import { getConnection } from 'typeorm';
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
@@ -61,7 +61,7 @@ export class TeamResolver {
     let team;
     try {
       // User.create({}).save()
-      const result = await appDataSource
+      const result = await getConnection()
         .createQueryBuilder()
         .insert()
         .into(Team)
