@@ -106,8 +106,8 @@ const main = async () => {
 
   app.locals.javascript = javascript;
 
-  app.locals.title = 'LiReddit';
-  app.locals.description = 'A Reddit clone.';
+  app.locals.title = 'Slack Clone';
+  app.locals.description = 'A Slack Clone.';
 
   await apolloServer.start();
 
