@@ -29,6 +29,7 @@ class UsernameRegisterInput {
 }
 
 // TODO: Continue trying to make a response for mequery that includes any team information on a user
+// TODO: Then figure out how to add creatorId to GraphQL script
 
 @ObjectType()
 class UserObject {
@@ -39,15 +40,19 @@ class UserObject {
 }
 
 @ObjectType()
-class MeQueryResponse {
+class Team {
   @Field()
-  user: UserObject;
-  @Field()
-  team_id: string;
+  id: number;
   @Field()
   team_name: string;
-  @Field()
-  owner: number;
+}
+
+@ObjectType()
+class MeQueryResponse {
+  @Field(() => [User], { nullable: true })
+  user?: User[];
+
+  team_id: number;
 }
 
 @ObjectType()
@@ -80,12 +85,13 @@ export class UserResolver {
     return '';
   }
 
-  @Query(() => User)
+  @Query(() => MeQueryResponse)
   async me(@Ctx() { req }: MyContext) {
     // You are not logged in
     if (!req.session.userId) {
       return null;
     }
+    console.log('meQuery: ');
 
     const id = req.session.userId;
 
@@ -93,9 +99,7 @@ export class UserResolver {
       where: {
         id: id,
       },
-      relations: {
-        teams: true,
-      },
+      relations: ['teams'],
     });
 
     console.log('user: ', user);
