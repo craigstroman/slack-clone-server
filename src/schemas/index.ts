@@ -1,5 +1,5 @@
 import { mergeTypeDefs } from '@graphql-tools/merge';
-import { UserType } from './user';
-import { TeamType } from './team';
+import { userSchema } from './user';
+import { teamSchema } from './team';
 
-export const mergedTypes = mergeTypeDefs([UserType, TeamType]);
+export const typeDefs = mergeTypeDefs([userSchema, teamSchema]);
