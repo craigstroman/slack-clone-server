@@ -1,4 +1,4 @@
-export const Team = `
+export const TeamType = `
     type Team {
         id: Int!
         name: String!
