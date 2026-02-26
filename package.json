@@ -28,8 +28,8 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
+    "@graphql-tools/merge": "^9.1.7",
     "@graphql-tools/schema": "^10.0.31",
-    "@graphql-tools/stitch": "^10.1.12",
     "@urql/exchange-graphcache": "^8.1.0",
     "apollo-server-express": "2.16.1",
     "argon2": "^0.43.1",
