@@ -1,4 +1,6 @@
-export const User = `
+import { gql } from 'apollo-server-express';
+
+export const userSchema = gql`
     type User {
         id: Int!
         first_name: String!
@@ -28,5 +30,5 @@ export const User = `
     type Mutation {
         register(first_name: String!, last_name: String!, phone_number: String!, username: String!, email: String!, password: String!): RegisterResponse!
         login(email: String!, password: String!): LoginResponse!
-    }    
+    }   
 `;
