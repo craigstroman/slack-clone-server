@@ -1,4 +1,5 @@
 import { Resolver, Mutation, Arg, InputType, Field, Ctx, ObjectType, Root, Query } from 'type-graphql';
+import { gql } from 'apollo-server-express';
 import { v4 } from 'uuid';
 import { getConnection } from 'typeorm';
 import { MyContext } from '../types';
@@ -30,29 +31,14 @@ class UsernameRegisterInput {
 
 // TODO: Continue trying to make a response for mequery that includes any team information on a user
 // TODO: Then figure out how to add creatorId to GraphQL script
-
-@ObjectType()
-class UserObject {
-  @Field()
-  id: number;
-  @Field()
-  username: string;
-}
-
-@ObjectType()
-class Team {
-  @Field()
-  id: number;
-  @Field()
-  team_name: string;
-}
+// TODO: Maybe switch to using schema's instead of doing what Ben Awad did here 
 
 @ObjectType()
 class MeQueryResponse {
-  @Field(() => [User], { nullable: true })
-  user?: User[];
-
-  team_id: number;
+  @Field(() => [User])
+  user: User;
+  @Field()
+  team_name: string;
 }
 
 @ObjectType()
