@@ -45,7 +45,7 @@
     "pug": "^3.0.3",
     "reflect-metadata": "0.1.13",
     "type-graphql": "1.0.0-rc.3",
-    "typeorm": "0.2.25",
+    "typeorm": "0.3.26",
     "uuid": "^11.1.0"
   }
 }
