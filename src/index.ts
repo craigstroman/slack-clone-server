@@ -67,9 +67,7 @@ const main = async () => {
     entities: [User, Team, Member, Text],
   });
 
-  //if (nodeEnv === 'development') {
   await conn.runMigrations();
-  //}
 
   app.use(
     cors({
