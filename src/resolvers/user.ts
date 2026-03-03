@@ -74,10 +74,7 @@ export class UserResolver {
       where: {
         id: id,
       },
-      relations: ['teams'],
     });
-
-    console.log('user: ', user);
 
     return user;
   }
