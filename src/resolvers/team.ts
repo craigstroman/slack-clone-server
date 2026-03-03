@@ -1,4 +1,14 @@
-import { Resolver, Mutation, UseMiddleware, Arg, InputType, Field, Ctx, ObjectType } from 'type-graphql';
+import {
+  Resolver,
+  Mutation,
+  UseMiddleware,
+  Arg,
+  InputType,
+  Field,
+  Ctx,
+  ObjectType,
+  Query,
+} from 'type-graphql';
 import { MyContext } from '../types';
 import { Team } from '../entities/index';
 import path from 'path';
@@ -37,8 +47,35 @@ class TeamResponse {
   team?: Team;
 }
 
+@ObjectType()
+class Teams {
+  @Field(() => [Team])
+  teams: Team[];
+}
+
 @Resolver(Team)
 export class TeamResolver {
+  @Query(() => Teams, { nullable: true })
+  async getTeams(@Ctx() { req }: MyContext): Promise<Teams> {
+    const replacements: any[] = [];
+    if (req.session.userId) {
+      replacements.push(req.session.userId);
+    }
+
+    let teamsResponse: Team[] = [];
+
+    try {
+      teamsResponse = await Team.find({ where: { id: req.session.userId }, relations: ['creator'] });
+    } catch (error) {
+      console.log('There was an error: ');
+      console.log(error);
+    }
+
+    return {
+      teams: teamsResponse,
+    };
+  }
+
   @Mutation(() => TeamResponse)
   @UseMiddleware(isAuth)
   async create_team(
