@@ -1,5 +1,4 @@
 import { Resolver, Mutation, Arg, InputType, Field, Ctx, ObjectType, Root, Query } from 'type-graphql';
-import { gql } from 'apollo-server-express';
 import { v4 } from 'uuid';
 import { getConnection } from 'typeorm';
 import { MyContext } from '../types';
@@ -12,6 +11,7 @@ import argon2 from 'argon2';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const frontEndPort: number | string = process.env.FRONT_END_PORT ? process.env.FRONT_END_PORT : 0;
+
 
 @InputType()
 class UsernameRegisterInput {
@@ -27,18 +27,6 @@ class UsernameRegisterInput {
   username: string;
   @Field()
   password: string;
-}
-
-// TODO: Continue trying to make a response for mequery that includes any team information on a user
-// TODO: Then figure out how to add creatorId to GraphQL script
-// TODO: Maybe switch to using schema's instead of doing what Ben Awad did here 
-
-@ObjectType()
-class MeQueryResponse {
-  @Field(() => [User])
-  user: User;
-  @Field()
-  team_name: string;
 }
 
 @ObjectType()
@@ -71,12 +59,13 @@ export class UserResolver {
     return '';
   }
 
-  @Query(() => MeQueryResponse)
+  @Query(() => User)
   async me(@Ctx() { req }: MyContext) {
     // You are not logged in
     if (!req.session.userId) {
       return null;
     }
+    @FieldResolver(() => [Team])
     console.log('meQuery: ');
 
     const id = req.session.userId;
