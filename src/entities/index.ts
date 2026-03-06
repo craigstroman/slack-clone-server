@@ -77,6 +77,10 @@ export class Team extends BaseEntity {
   user_id!: number;
 
   @Field()
+  @Column()
+  creatorId: number;
+
+  @Field()
   @ManyToOne(() => User, (user) => user.teams)
   creator: User;
 
