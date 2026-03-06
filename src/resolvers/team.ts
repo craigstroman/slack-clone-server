@@ -28,6 +28,8 @@ class TeamCreateInput {
   owner: number;
   @Field()
   user_id: number;
+  @Field()
+  creatorId: number;
 }
 
 @ObjectType()
@@ -82,6 +84,8 @@ export class TeamResolver {
     @Arg('options') options: TeamCreateInput,
     @Ctx() { req }: MyContext,
   ): Promise<UserResponse> {
+    console.log('create_team: ');
+    console.log('options: ', options);
     if (options.name.length <= 2) {
       return {
         errors: [
@@ -93,11 +97,8 @@ export class TeamResolver {
       };
     }
 
-    console.log('req.session.userId: ', req.session.userId);
-
     let team;
     try {
-      // User.create({}).save()
       const result = await getConnection()
         .createQueryBuilder()
         .insert()
@@ -105,14 +106,13 @@ export class TeamResolver {
         .values({
           name: options.name,
           owner: options.owner,
-          user_id: 1,
+          user_id: options.user_id,
+          creatorId: options.creatorId,
         })
         .returning('*')
         .execute();
       team = result.raw[0];
     } catch (err) {
-      //|| err.detail.includes("already exists")) {
-      // duplicate username error
       if (err.code === '23505') {
         return {
           errors: [
