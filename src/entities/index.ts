@@ -44,7 +44,7 @@ export class User extends BaseEntity {
   password!: string;
 
   @OneToMany(() => Team, (team) => team.creator)
-  teams: [];
+  teams: Team[];
 
   @Field(() => String)
   @CreateDateColumn()
