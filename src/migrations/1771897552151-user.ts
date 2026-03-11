@@ -1,24 +1,53 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
+import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
 export class user1771897552151 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(
-      `
-                CREATE TABLE IF NOT EXISTS public."user"
-                (
-                    id integer NOT NULL DEFAULT nextval('user_id_seq'::regclass),
-                    created_at timestamp without time zone NOT NULL DEFAULT now(),
-                    updated_at timestamp without time zone NOT NULL DEFAULT now(),
-                    first_name character varying COLLATE pg_catalog."default" NOT NULL,
-                    last_name character varying COLLATE pg_catalog."default" NOT NULL,
-                    email character varying COLLATE pg_catalog."default" NOT NULL,
-                    username character varying COLLATE pg_catalog."default" NOT NULL,
-                    password character varying COLLATE pg_catalog."default" NOT NULL,
-                    CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY (id),
-                    CONSTRAINT "UQ_78a916df40e02a9deb1c4b75edb" UNIQUE (username),
-                    CONSTRAINT "UQ_e12875dfb3b1d92d7d7c5377e22" UNIQUE (email)
-                ); 
-            `,
+    await queryRunner.createTable(
+      new Table({
+        name: 'users',
+        columns: [
+          {
+            name: 'id',
+            type: 'int',
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: 'increment',
+          },
+          {
+            name: 'first_name',
+            type: 'varchar',
+          },
+          {
+            name: 'last_name',
+            type: 'varchar',
+          },
+          {
+            name: 'phone_number',
+            type: 'varchar',
+          },
+          {
+            name: 'email',
+            type: 'varchar',
+            isUnique: true,
+          },
+          {
+            name: 'username',
+            type: 'varchar',
+          },
+          {
+            name: 'password',
+            type: 'varchar',
+          },
+          {
+            name: 'updated_at',
+            type: 'varchar',
+          },
+          {
+            name: 'created_at',
+            type: 'varchar',
+          },
+        ],
+      }),
     );
   }
 
