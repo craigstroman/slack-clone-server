@@ -8,6 +8,7 @@ import {
   BaseEntity,
   OneToMany,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 // User Entity
@@ -44,6 +45,7 @@ export class User extends BaseEntity {
   password!: string;
 
   @OneToMany(() => Team, (team) => team.creator)
+  @JoinColumn({ name: 'id' })
   teams: Team[];
 
   @Field(() => String)
@@ -72,16 +74,13 @@ export class Team extends BaseEntity {
   @Column()
   owner!: number;
 
-  @Field(() => Number)
-  @Column()
-  user_id!: number;
-
   @Field()
   @Column()
-  creatorId: number;
+  creator_id: number;
 
   @Field()
   @ManyToOne(() => User, (user) => user.teams)
+  @JoinColumn({ name: 'creator_id' })
   creator: User;
 
   @Field(() => String)
