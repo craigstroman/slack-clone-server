@@ -41,7 +41,7 @@ class TeamError {
 }
 
 @ObjectType()
-class TeamResponse {
+class TeamCreateResponse {
   @Field(() => [TeamError], { nullable: true })
   errors?: FieldError[];
 
@@ -78,53 +78,24 @@ export class TeamResolver {
     };
   }
 
-  @Mutation(() => TeamResponse)
+  @Mutation(() => TeamCreateResponse)
   @UseMiddleware(isAuth)
   async create_team(
     @Arg('options') options: TeamCreateInput,
     @Ctx() { req }: MyContext,
-  ): Promise<UserResponse> {
-    console.log('create_team: ');
-    console.log('options: ', options);
-    if (options.name.length <= 2) {
-      return {
-        errors: [
-          {
-            field: 'name',
-            message: 'Team name must be greater than 2 characters long.',
-          },
-        ],
-      };
-    }
+  ): Promise<TeamCreateResponse> {
+    const createdTeam = await Team.create({
+      ...options,
+      creator_id: req.session.userId,
+    }).save();
 
-    let team;
-    try {
-      const result = await getConnection()
-        .createQueryBuilder()
-        .insert()
-        .into(Team)
-        .values({
-          name: options.name,
-          owner: options.owner,
-          user_id: options.user_id,
-          creatorId: options.creatorId,
-        })
-        .returning('*')
-        .execute();
-      team = result.raw[0];
-    } catch (err) {
-      if (err.code === '23505') {
-        return {
-          errors: [
-            {
-              field: 'name',
-              message: 'Team name already taken',
-            },
-          ],
-        };
-      }
-    }
+    const team = await Team.findOne({
+      where: { id: createdTeam.id },
+      relations: ['creator'],
+    });
 
-    return { team };
+    return {
+      team: team ?? undefined,
+    };
   }
 }
