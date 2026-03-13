@@ -12,8 +12,6 @@ Online demo at http://slack-clone.craigstroman.com/.
 - Run `npm run live:server` or `yarn run live:server` to start the client development environment.
 - You can visit http://localhost:9001/graphql in the browser to view the GraphQL query window.
 
-Note: This is running on WebPack devServer and will automatically refresh when you make changes to the project.
-
 ## Running in production
 
 - CD into slack-clone-server.
