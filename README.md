@@ -10,8 +10,7 @@ Online demo at http://slack-clone.craigstroman.com/.
 - CD into slack-clone-server.
 - Run `npm install` or `yarn install` to install all required Node moduels.
 - Run `npm run live:server` or `yarn run live:server` to start the client development environment.
-- You can visit http://localhost:9001/graphql in the browser to view the GraphQL query window. But to do anything you need the
-  [Slack Clone Server](https://github.com/craigstroman/slack-clone-server) running in another terminal window locally.
+- You can visit http://localhost:9001/graphql in the browser to view the GraphQL query window.
 
 Note: This is running on WebPack devServer and will automatically refresh when you make changes to the project.
 
