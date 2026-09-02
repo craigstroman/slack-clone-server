@@ -172,8 +172,9 @@ export class UserResolver {
 
     console.log('Login mutation called');
 
-    context.req.session.userId = user.id;
-
+    if (context.req.session) {
+      context.req.session.userId = user.id;
+    }
     console.log('===== LOGIN =====');
     console.log('sessionID:', context.req.sessionID);
     console.log('cookie header:', context.req.headers.cookie);
@@ -183,5 +184,31 @@ export class UserResolver {
     }
 
     return { user };
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise<boolean>((resolve) => {
+      if (!req.session) {
+        console.log('req.session is not set.');
+        resolve(false);
+        return;
+      }
+
+      console.log('req.session is set:', req.session);
+
+      req.session.destroy((err: any) => {
+        res.clearCookie('uid');
+
+        if (err) {
+          console.log('There was an issue destroying the session.');
+          console.log('err:', err);
+          resolve(false);
+          return;
+        }
+
+        resolve(true);
+      });
+    });
   }
 }
