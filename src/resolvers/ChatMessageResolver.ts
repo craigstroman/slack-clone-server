@@ -56,7 +56,6 @@ export class ChatMessageResolver {
     const messageRepository = AppDataSource.getRepository(ChatMessage);
 
     const message: ChatMessage = messageRepository.create({
-      roomId: room.id,
       room,
       username,
       text,
