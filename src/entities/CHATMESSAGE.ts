@@ -6,7 +6,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BaseEntity,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { ChatRoom } from './CHATROOM';
 
 @ObjectType()
 @Entity()
@@ -14,10 +17,6 @@ export class ChatMessage extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Field()
-  @Column()
-  roomId: number;
 
   @Field()
   @Column()
@@ -30,6 +29,10 @@ export class ChatMessage extends BaseEntity {
   @Field()
   @Column()
   text: string;
+
+  @ManyToOne(() => ChatRoom, (room) => room.messages)
+  @JoinColumn({ name: 'roomId' })
+  room: ChatRoom;
 
   @Field(() => String)
   @CreateDateColumn()
